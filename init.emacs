@@ -13,22 +13,19 @@
 ;; Setup Chinese font
 (if (string= system-type "darwin")
     nil)
-(if (string= system-type "windows-nt") nil)
+(if (string= system-type "windows-nt")
+    ;; 设置时注意SIZE要用浮点数，不用整数。
+    (dolist (charset '(kana han symbol cjk-misc bopomofo))
+      (set-fontset-font (frame-parameter nil 'font) charset
+			(font-spec :family "Microsoft Yahei" :size 10.0))))
 
-;; ÉèÖÃÖÐÓ¢ÎÄ×ÖÌå
-;; Set English font
-(set-face-attribute 'default nil :font "Dejavu Sans Mono 10")
-;; Set Chinese font
-;; ÉèÖÃÊ±×¢ÒâSIZEÒªÓÃ¸¡µãÊý£¬²»ÓÃÕûÊý¡£
-(dolist (charset '(kana han symbol cjk-misc bopomofo))
-  (set-fontset-font (frame-parameter nil 'font) charset
-		    (font-spec :family "Microsoft Yahei" :size 10.0)))
-;; ÉèÖÃEmacs³ÌÐò´ò¿ªÊ±¿ò¼ÜµÄ³õÊ¼¿í¶ÈºÍ¸ß¶È
+
+;; 设置Emacs程序打开时框架的初始宽度和高度
 (setq initial-frame-alist '((width . 100)
 			    (height . 42)))
 
-;; ÉèÖÃEmacs±³¾°µÄÍ¸Ã÷¶È
-;; Anchor: March Liu (ÁõöÎ) <march.liu@gmail.com>
+;; 设置Emacs背景的透明度
+;; Anchor: March Liu (刘鑫) <march.liu@gmail.com>
 ;; (global-set-key [(f11)] 'loop-alpha)
 
 (setq alpha-list '((100 100) (95 65) (85 55) (75 45) (65 35)))
@@ -53,22 +50,32 @@
 (display-time-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; ÉèÖÃ¶à²ÊµÄEmacs
-(load-file "~/.emacs.d/color-theme-6.6.0/color-theme.el")
-(load-file "~/.emacs.d/color-theme-6.6.0/themes/color-theme-library.el")
-(require 'color-theme)
-;; (color-theme-gnome2)
+;; 设置多彩的Emacs
+(if (file-exists-p "~/zenburn-emacs/zenburn-theme.el")
+    (progn
+      (load-file "~/zenburn-emacs/zenburn-theme.el")
+      (add-to-list 'custom-theme-load-path "~/zenburn-theme/")
+      (load-theme 'zenburn t))
+  (if (file-exists-p "~/.emacs.d/color-theme-6.6.0/color-theme.el")
+      (progn
+	(load-file "~/.emacs.d/color-theme-6.6.0/color-theme.el")
+	(load-file "~/.emacs.d/color-theme-6.6.0/themes/color-theme-library.el")
+	(require 'color-theme)
+	(color-theme-gnome2))))
 
-;; ×Ô¶¨ÒåÆô¶¯»­Ãæ
-(setq inhibit-startup-screen t)
-;; (defconst fancy-startup-text '())
-;; (defconst fancy-about-text '())
-;; PNG : 275Wx188H
-;; (setq fancy-splash-image "~/xinxin-145x188.xpm")
 
-;; Finally maximize current Emacs frame
-;; ×îºó°Ñµ±Ç°Emacs×î´ó»¯¡£Ã²ËÆÔÚ´÷¶û±Ê¼Ç±¾WIN7ÏµÍ³ÉÏ²»ÉúÐ§£¿
-;;(global-set-key (kbd "A-<f7>") #'(w32-send-sys-command  #xf030))
+;; 设置多彩的Emacs
+(if (file-exists-p "~/zenburn-emacs/zenburn-theme.el")
+    (progn
+      (load-file "~/zenburn-emacs/zenburn-theme.el")
+      (add-to-list 'custom-theme-load-path "~/zenburn-theme/")
+      (load-theme 'zenburn t))
+  (if (file-exists-p "~/.emacs.d/color-theme-6.6.0/color-theme.el")
+      (progn
+	(load-file "~/.emacs.d/color-theme-6.6.0/color-theme.el")
+	(load-file "~/.emacs.d/color-theme-6.6.0/themes/color-theme-library.el")
+	(require 'color-theme)
+	(color-theme-gnome2))))
 
 
 ;; (setq load-path (cons "~/.emacs.d/org-8.2.10/lisp" load-path))
