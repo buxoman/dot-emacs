@@ -1,4 +1,4 @@
-;; -*- mode: lisp; coding: utf-8; -*-
+;; -*- mode: lisp -*-
 ;;
 ;; This file should be saved with UTF-8 encoding.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -8,21 +8,41 @@
 (setq user-full-name "buxoman")
 (setq user-mail-address "buhongbo@163.com")
 
-;; Setup English font
-(set-face-attribute 'default nil :font "Dejavu Sans Mono 16")
-;; Setup Chinese font
-(if (string= system-type "darwin")
-    nil)
-(if (string= system-type "windows-nt")
-    ;; 设置时注意SIZE要用浮点数，不用整数。
-    (dolist (charset '(kana han symbol cjk-misc bopomofo))
-      (set-fontset-font (frame-parameter nil 'font) charset
-			(font-spec :family "Microsoft Yahei" :size 10.0))))
+;; 设置临时文件目录
+(setq tempdir (concat (file-name-directory
+		       (expand-file-name "~/.emacs"))
+		      "temp/"))
+(if (not (file-directory-p tempdir))
+    (mkdir tempdir))
+(setq temporary-file-directory tempdir)
+(setq ediff-temp-file-prefix tempdir)
 
+
+(defvar system-address "0.0.0.0")
+(if (string= system-type "windows-nt")
+    (progn (setq ipconfig (shell-command-to-string "ipconfig"))
+	   (if (string-match "IPv4.*\\(192\.168\.[0-9]+\.[0-9]+\\)" ipconfig)
+	       (setq system-address (match-string 1 ipconfig)))))
+
+;; Setup English font 设置英文字体
+(set-face-attribute 'default nil :font "Dejavu Sans Mono 10")
+;; Setup Chinese font 设置中文字体
+(set-fontset-font t 'han (font-spec :family "Microsoft Yahei" :size 10.0))
 
 ;; 设置Emacs程序打开时框架的初始宽度和高度
 (setq initial-frame-alist '((width . 100)
-			    (height . 42)))
+			    (height . 36)
+			    (vertical-scroll-bars . nill)))
+;; 设置行间距：若是浮点数则该值乘以缺省行高度作为行间距；若是整数则是以十分之一点为单位的距离。
+(setq-default line-spacing 0.3)
+;; 在窗口的标题条上显示当前buffer的名称或者文件名（带有绝对路径）
+;; 并显示Windows系统的IP地址
+(setq frame-title-format
+      '((:eval (or buffer-file-name (buffer-name)))
+	(:eval (if (buffer-modified-p) " * " " - "))
+	invocation-name
+	"@"
+	system-address))
 
 ;; 设置Emacs背景的透明度
 ;; Anchor: March Liu (刘鑫) <march.liu@gmail.com>
@@ -50,41 +70,49 @@
 (display-time-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; 设置多彩的Emacs
-(if (file-exists-p "~/zenburn-emacs/zenburn-theme.el")
-    (progn
-      (load-file "~/zenburn-emacs/zenburn-theme.el")
-      (add-to-list 'custom-theme-load-path "~/zenburn-theme/")
-      (load-theme 'zenburn t))
-  (if (file-exists-p "~/.emacs.d/color-theme-6.6.0/color-theme.el")
-      (progn
-	(load-file "~/.emacs.d/color-theme-6.6.0/color-theme.el")
-	(load-file "~/.emacs.d/color-theme-6.6.0/themes/color-theme-library.el")
-	(require 'color-theme)
-	(color-theme-gnome2))))
-
 
 ;; 设置多彩的Emacs
-(if (file-exists-p "~/zenburn-emacs/zenburn-theme.el")
-    (progn
-      (load-file "~/zenburn-emacs/zenburn-theme.el")
-      (add-to-list 'custom-theme-load-path "~/zenburn-theme/")
-      (load-theme 'zenburn t))
-  (if (file-exists-p "~/.emacs.d/color-theme-6.6.0/color-theme.el")
-      (progn
-	(load-file "~/.emacs.d/color-theme-6.6.0/color-theme.el")
-	(load-file "~/.emacs.d/color-theme-6.6.0/themes/color-theme-library.el")
-	(require 'color-theme)
-	(color-theme-gnome2))))
+;; (if (file-exists-p "~/zenburn-emacs/zenburn-theme.el")
+;;     (progn
+;;       (load-file "~/zenburn-emacs/zenburn-theme.el")
+;;       (add-to-list 'custom-theme-load-path "~/zenburn-theme/")
+;;       (load-theme 'zenburn t))
+;;   (if (file-exists-p "~/.emacs.d/color-theme-6.6.0/color-theme.el")
+;;       (progn
+;; 	(load-file "~/.emacs.d/color-theme-6.6.0/color-theme.el")
+;; 	(load-file "~/.emacs.d/color-theme-6.6.0/themes/color-theme-library.el")
+;; 	(require 'color-theme)
+;; 	(color-theme-gnome2))))
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+(load-theme 'monokai t)
+;; 自定义启动画面
+(setq inhibit-startup-screen t)
+;; (defconst fancy-startup-text '())
+;; (defconst fancy-about-text '())
+;; PNG : 275Wx188H
+;; (setq fancy-splash-image "~/xinxin-145x188.xpm")
+
+;; Finally maximize current Emacs frame
+;; 最后把当前Emacs最大化。貌似在戴尔笔记本WIN7系统上不生效？
+;;(global-set-key (kbd "A-<f7>") #'(w32-send-sys-command  #xf030))
 
 
 ;; (setq load-path (cons "~/.emacs.d/org-8.2.10/lisp" load-path))
 ;; (setq load-path (cons "~/.emacs.d/org-8.2.10/contrib/lisp" load-path))
 (setq load-path (cons "~/.emacs.d/elpa/org-20150720/lisp" load-path))
 (setq load-path (cons "~/.emacs.d/elpa/org-20150720/contrib/lisp" load-path))
-(set-face-foreground 'font-lock-keyword-face "DeepSkyBlue1")
-(set-face-foreground 'font-lock-string-face "Goldenrod")
+
+;; (set-face-foreground 'font-lock-keyword-face "DeepSkyBlue1")
+;; (set-face-foreground 'font-lock-string-face "Goldenrod")
 (require 'org)
 (org-add-hook 'org-mode-hook 'auto-fill-mode 'append)
 (setq-default fill-column 80)
 ;; (load-file "~/org-config.el")
+
+;;;;
+;;;; minibuf config
+;;;;
+(setq read-file-name-completion-ignore-case t) ;;补完文件名称时忽略大小写
+(setq completion-auto-help 'lazy) ;; 按第二次TAB键才显示补完备选列表
+
+
