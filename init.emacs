@@ -116,3 +116,74 @@
 (setq completion-auto-help 'lazy) ;; 按第二次TAB键才显示补完备选列表
 
 
+(defun c-source-list (dir)
+  "递归地列出一个目录及其子目录下的所有C文件和H文件, 但不包含圆点开头的文件."
+  (if (file-directory-p dir)
+      (append
+       (directory-files dir t "\\.\[hHcC\]$")
+       (apply 'append (mapcar 'c-source-list (directory-files dir t "[^\\.]+"))))))
+
+(defun cpp-source-list (dir)
+  "递归地列出一个目录及其子目录下的所有C文件和H文件, 但不包含圆点开头的文件."
+  (if (file-directory-p dir)
+      (append
+       (directory-files dir t "\\.[hH]$")
+       (directory-files dir t "\\.[hH][pP][pP]$")
+       (directory-files dir t "\\.[cC][pP][pP]$")
+       (apply 'append (mapcar 'c-source-list (directory-files dir t "[^\\.]+"))))))
+
+(defun c-project (dir)
+  "打开目录DIR及其子目录下的所有C文件和H文件."
+  (interactive "Dinput c source root: ")
+  (setq allfiles (c-source-list dir))
+  ;;(message "%s" allfiles)
+  ;;(message "length %d" (safe-length allfiles))
+  (with-temp-buffer
+    ;; 预先在C文件根目录下通过Windows命令dir /B /S显示所有文件
+    ;; 然后将每一个文件都作为etags命令的输入：
+    ;; @etags.exe -a --lang=c xxxx.c
+    (setq cmdfile (concat dir "/etags.bat"))
+    (setq tagfile (concat dir "/TAGS"))
+    (if (file-exists-p cmdfile)
+	(delete-file cmdfile))
+    (if (file-exists-p tagfile)
+	(delete-file tagfile))
+    (mapc (lambda (file)
+	    (insert (format "\@etags\.exe \-a \-\-lang=c %s\n" file)))
+	  allfiles)
+    (if (file-writable-p cmdfile)
+	(write-file cmdfile)))
+    (cd dir)
+    (shell-command "etags.bat" nil nil)
+    (visit-tags-table "TAGS")
+    (mapc (lambda (file)
+	    (find-file file))
+	  allfiles))
+
+(defun cpp-project (dir)
+  "打开目录DIR及其子目录下的所有C文件和H文件."
+  (interactive "Dinput c source root: ")
+  (setq allfiles (cpp-source-list dir))
+  ;;(message "%s" allfiles)
+  ;;(message "length %d" (safe-length allfiles))
+  (with-temp-buffer
+    ;; 预先在C文件根目录下通过Windows命令dir /B /S显示所有文件
+    ;; 然后将每一个文件都作为etags命令的输入：
+    ;; @etags.exe -a --lang=c xxxx.c
+    (setq cmdfile (concat dir "/etags.bat"))
+    (setq tagfile (concat dir "/TAGS"))
+    (if (file-exists-p cmdfile)
+	(delete-file cmdfile))
+    (if (file-exists-p tagfile)
+	(delete-file tagfile))
+    (mapc (lambda (file)
+	    (insert (format "\@etags\.exe \-a \-\-lang=cxx %s\n" file)))
+	  allfiles)
+    (if (file-writable-p cmdfile)
+	(write-file cmdfile)))
+    (cd dir)
+    (shell-command "etags.bat" nil nil)
+    (visit-tags-table "TAGS")
+    (mapc (lambda (file)
+	    (find-file file))
+	  allfiles))
