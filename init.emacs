@@ -1,4 +1,4 @@
-;; -*- mode: lisp -*-
+;; -*- mode:emacs-lisp;coding:utf-8 -*-
 ;;
 ;; This file should be saved with UTF-8 encoding.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -7,6 +7,10 @@
 
 (setq user-full-name "buxoman")
 (setq user-mail-address "buhongbo@163.com")
+
+;; 直接关闭buffer，（默认是用kill-buffer，会询问是否真的kill，挺烦的）
+;;(global-key-binding (kbd "C-x k") 'kill-this-buffer) ;; 貌似不起作用
+(global-set-key (kbd "C-x k") 'kill-this-buffer)
 
 ;; 设置临时文件目录
 (setq tempdir (concat (file-name-directory
