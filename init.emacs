@@ -179,6 +179,18 @@
 ;; (require 'cygwin-mount)
 ;;(require 'setup-cygwin)
 
+;; Windows 上使用 git-bash 作为 Emacs 的交互式 shell( M-x shell 调用 )
+;;
+;; 为了避免显示 PS1 提示符乱码，在 ~/.bash_profile 文件中添加下列配置：
+;; if [ -n "$INSIDE_EMACS" ]; then
+;;     export PS1='\[\033[32m\]\u@\h \[\033[33m\]\w\[\033[36m\]`__git_ps1`\[\033[0m\]\n$ '
+;; fi
+;;
+(setq explicit-shell-file-name "C:/Program Files (x86)/Git/bin/bash.exe")
+(setq explicit-bash.exe-args '("--login" "-i"))
+;; 在执行命令中显示时若乱码，可以尝试下列配置
+(prefer-coding-system 'utf-8)
+
 (defun c-source-list (dir)
   "递归地列出一个目录及其子目录下的所有C文件和H文件, 但不包含圆点开头的文件."
   (if (file-directory-p dir)
