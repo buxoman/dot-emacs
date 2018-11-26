@@ -190,7 +190,17 @@
 (setq explicit-bash.exe-args '("--login" "-i"))
 ;; 在执行命令中显示时若乱码，可以尝试下列配置
 (prefer-coding-system 'utf-8)
+;; Using `grep' and `find' on MS Windows
+(setenv "PATH" (concat
+                ;; Change this with your path to MSYS bin directory
+                ;; 注意,这里用的是 Windows 系统环境变量 PATH 的设置方法:
+                ;; 要用冒号分隔, 要注意对路径分隔符做转义`\\'.
+                "c:\\Program Files (x86)\\Git\\usr\\bin;"
+                (getenv "PATH")))
 
+;;====================================================================
+;; 自定义 C 语言项目管理函数
+;;====================================================================
 (defun c-source-list (dir)
   "递归地列出一个目录及其子目录下的所有C文件和H文件, 但不包含圆点开头的文件."
   (if (file-directory-p dir)
